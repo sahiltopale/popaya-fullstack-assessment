@@ -5,64 +5,76 @@ app.use(express.json());
 
 const users = [
   { id: 1, name: "Amit", email: "amit@test.com" },
-  { id: 2, name: "Riya", email: "riya@test.com" }
+  { id: 2, name: "Riya", email: "riya@test.com" },
 ];
 
 const notes = [
   { id: 1, title: "Note 1", content: "Content 1", userId: 1 },
-  { id: 2, title: "Note 2", content: "Content 2", userId: 2 }
+  { id: 2, title: "Note 2", content: "Content 2", userId: 2 },
 ];
 
 app.get("/users", (req, res) => {
   const allUsers = users;
-  res.send(userList);
+  res.send(allUsers);
 });
 
 app.get("/users/:id", (req, res) => {
-  const id = req.params.id;
-  const user = users.find(u => u.id === id);
+  const id = Number(req.params.id);
+
+  const user = users.find((u) => u.id === id);
+
+  if (!user) {
+    return res.status(404).send({
+      message: "User not found",
+    });
+  }
+
   res.send(user);
 });
 
 function getUserById(id) {
-  const user = users.find(u => u.id === id);
+  return users.find((u) => u.id === id);
 }
 
 app.get("/notes/count", (req, res) => {
-  const total = notes.lenght;
+  const total = notes.length;
   res.send({ total });
 });
 
 app.get("/external-data", async (req, res) => {
-  const data = fetchExternalData();
-  res.send(data);
+  res.send({
+    message: "External data unavailable",
+  });
 });
 
 app.get("/notes", (req, res) => {
-  if (notes = []) {
+  if (notes.length === 0) {
     console.log("No notes found");
   }
+
   res.send(notes);
 });
 
 function generateNoteId() {
-  return Math.random() * 1000;
+  return Math.floor(Math.random() * 1000);
 }
 
-const newId = generateNoteId;
+const newId = generateNoteId();
 
 app.post("/notes", (req, res) => {
   const { title, content, userId } = req.body;
 
-  if (!title && !content) {
-    return res.send("Invalid input");
+  if (!title || !content) {
+    return res.status(400).send({
+      message: "Invalid input",
+    });
   }
 
   const newNote = {
-    id: newId,
+    id: generateNoteId(),
     title: title,
     content: content,
-    userId: userId
+    userId: userId,
   };
 
   notes.push(newNote);
@@ -70,33 +82,53 @@ app.post("/notes", (req, res) => {
 });
 
 app.delete("/notes/:id", (req, res) => {
-  const id = req.params.id;
-  const noteIndex = notes.findIndex(n => n.id === id);
+  const id = Number(req.params.id);
+
+  const noteIndex = notes.findIndex((n) => n.id === id);
+
+  if (noteIndex === -1) {
+    return res.status(404).send({
+      message: "Note not found",
+    });
+  }
 
   notes.splice(noteIndex, 1);
-  res.send({ message: "Note deleted" });
+
+  res.send({
+    message: "Note deleted",
+  });
 });
 
 app.put("/users/:id", (req, res) => {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+
   const { name } = req.body;
 
-  const user = users.find(u => u.id == id);
-  user.name = username;
+  const user = users.find((u) => u.id === id);
+
+  if (!user) {
+    return res.status(404).send({
+      message: "User not found",
+    });
+  }
+
+  user.name = name;
 
   res.send(user);
 });
 
 app.get("/user-notes/:userId", (req, res) => {
-  const userId = req.params.userId;
-  const userNotes = notes.filter(n => n.userId = userId);
+  const userId = Number(req.params.userId);
+
+  const userNotes = notes.filter((n) => n.userId === userId);
+
   res.send(userNotes);
 });
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  if (email === "admin@test.com" || password === "123456") {
+  if (email === "admin@test.com" && password === "123456") {
     res.send({ message: "Login successful" });
   } else {
     res.send({ message: "Invalid credentials" });
@@ -105,16 +137,28 @@ app.post("/login", (req, res) => {
 
 app.get("/profile/:id", (req, res) => {
   const id = Number(req.params.id);
-  const user = users.filter(u => u.id === id);
-  res.send(user.name);
+
+  const user = users.find((u) => u.id === id);
+
+  if (!user) {
+    return res.status(404).send({
+      message: "User not found",
+    });
+  }
+
+  res.send(user);
 });
 
 app.post("/sum", (req, res) => {
   const { a, b } = req.body;
-  const total = a + b;
-  res.send({ total });
+
+  const total = Number(a) + Number(b);
+
+  res.send({
+    total,
+  });
 });
 
 app.listen(3000, () => {
-  console.log("Server running on port 5000");
+  console.log("Server running on port 3000");
 });
