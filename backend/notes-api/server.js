@@ -12,6 +12,10 @@ app.use(cors());
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Notes API is running 🚀");
+});
+
 app.use("/notes", noteRoutes);
 
 mongoose
