@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000/notes";
+const API = `${import.meta.env.VITE_API_URL}/notes`;
 
 export const getNotes = () => axios.get(API);
 
