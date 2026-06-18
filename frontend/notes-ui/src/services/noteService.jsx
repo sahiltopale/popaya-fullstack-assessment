@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = `${import.meta.env.VITE_API_URL}/notes`;
+const API = "https://popaya-fullstack-assessment.onrender.com/notes";
 
 export const getNotes = () => axios.get(API);
 

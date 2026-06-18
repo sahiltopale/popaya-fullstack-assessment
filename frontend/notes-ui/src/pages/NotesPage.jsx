@@ -24,7 +24,7 @@ export default function NotesPage() {
       const res = query.trim()
         ? await searchNotes(query.trim())
         : await getNotes();
-      setNotes(res.data);
+      setNotes(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -48,6 +48,7 @@ export default function NotesPage() {
       await fetchNotes(search);
     } catch (err) {
       console.error(err);
+      setNotes([]);
     }
   };
 
@@ -68,7 +69,8 @@ export default function NotesPage() {
         <div>
           <h1 className="app-title">Notes</h1>
           <p className="app-subtitle">
-            {notes.length} {notes.length === 1 ? "note" : "notes"}
+            {Array.isArray(notes) ? notes.length : 0}{" "}
+            {notes?.length === 1 ? "note" : "notes"}
             {search && ` matching "${search}"`}
           </p>
         </div>
